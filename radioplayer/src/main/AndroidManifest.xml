@@ -1,0 +1,20 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.likhanov.radioplayer">
+
+    <application
+            android:allowBackup="true"
+            android:name=".RadioApp">
+
+        <receiver android:name="android.support.v4.media.session.MediaButtonReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON"/>
+            </intent-filter>
+        </receiver>
+
+        <receiver
+                android:name="com.likhanov.radioplayer.radio.RadioService$Companion$NotificationDismissedReceiver"
+                android:exported="false">
+        </receiver>
+    </application>
+
+</manifest>
