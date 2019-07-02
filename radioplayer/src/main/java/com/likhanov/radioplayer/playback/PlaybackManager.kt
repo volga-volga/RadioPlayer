@@ -70,7 +70,7 @@ class PlaybackManager(val playback: Playback, private val serviceCallback: Playb
     }
 
     fun handleStopRequest(withError: String?) {
-        playback.stop(true)
+        //playback.stop(true)
         serviceCallback.onPlaybackStop()
         updatePlaybackState(withError)
     }

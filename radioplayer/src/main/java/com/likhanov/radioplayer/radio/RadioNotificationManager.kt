@@ -131,7 +131,12 @@ class RadioNotificationManager(val service: MediaBrowserServiceCompat, val conte
     override fun onReceive(context: Context?, intent: Intent?) {
         val action = intent?.action
         when (action) {
-            ACTION_PAUSE -> transportControls?.pause()
+            ACTION_PAUSE ->{
+                hasInternetConnection().subscribe({
+                    if (it) transportControls?.pause()
+                    else transportControls?.stop()
+                }, Throwable::printStackTrace)
+            }
             ACTION_PLAY -> {
                 hasInternetConnection().subscribe({
                     if (it) {
