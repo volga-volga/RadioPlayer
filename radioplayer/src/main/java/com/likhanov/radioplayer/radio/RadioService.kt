@@ -1,6 +1,7 @@
 package com.likhanov.radioplayer.radio
 
 import android.app.PendingIntent
+import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -22,6 +23,7 @@ import android.support.v7.media.MediaRouter
 import com.likhanov.radioplayer.model.NotificationData
 import com.likhanov.radioplayer.playback.PlaybackManager
 import com.likhanov.radioplayer.playback.RadioPlayback
+import com.likhanov.radioplayer.util.Store
 import io.reactivex.disposables.CompositeDisposable
 import java.lang.ref.WeakReference
 
@@ -45,6 +47,7 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
     private val intentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
     private var audioNoisyReceiverRegistered = false
     private var lastData: NotificationData? = null
+    private lateinit var service: MediaBrowserServiceCompat
 
     companion object {
         const val MEDIA_ID_ROOT = "__ROOT__"
@@ -62,10 +65,11 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
 
     }
 
-    override fun onCreate() {
-        super.onCreate()
+    override fun init(service: MediaBrowserServiceCompat){
+        Store.init(applicationContext)
+        this.service = service
 
-        delayedStopHandler = DelayedStopHandler(this)
+        delayedStopHandler = DelayedStopHandler(service)
         playback = RadioPlayback("")
         playbackManager = PlaybackManager(playback, this)
 
@@ -74,7 +78,7 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
         session.setCallback(playbackManager.mediaSessionCallback)
         session.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS or MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS)
 
-        radioNotificationManager = RadioNotificationManager(this, baseContext)
+        radioNotificationManager = RadioNotificationManager(service, baseContext)
         mediaRouter = MediaRouter.getInstance(applicationContext)
 
         playbackManager.updatePlaybackState(null)
@@ -123,8 +127,8 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
     override fun setAd(url: String) = playback.setAd(url)
 
     override fun setSessionActivity(activity: Class<*>) {
-        val intent = Intent(this, activity)
-        val pendingIntent = PendingIntent.getActivity(this, 99, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val intent = Intent(applicationContext, activity)
+        val pendingIntent = PendingIntent.getActivity(applicationContext, 99, intent, PendingIntent.FLAG_UPDATE_CURRENT)
         session.setSessionActivity(pendingIntent)
     }
 
@@ -182,16 +186,10 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
             stopSelf()
     }
 
-    private class DelayedStopHandler(service: RadioService) : Handler() {
-        private val weakReference: WeakReference<RadioService> = WeakReference<RadioService>(service)
+    private class DelayedStopHandler(service: Service) : Handler() {
+        private val weakReference: WeakReference<Service> = WeakReference<Service>(service)
 
         override fun handleMessage(msg: Message) {
-            val service = weakReference.get()
-            if (service != null) {
-                if (service.playbackManager.playback.isPlaying) {
-                    return
-                }
-            }
         }
     }
 

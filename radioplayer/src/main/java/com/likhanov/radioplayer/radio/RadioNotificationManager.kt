@@ -1,10 +1,7 @@
 package com.likhanov.radioplayer.radio
 
 import android.annotation.SuppressLint
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
+import android.app.*
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -17,6 +14,7 @@ import android.os.Handler
 import android.os.RemoteException
 import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
+import android.support.v4.media.MediaBrowserServiceCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.app.NotificationCompat.MediaStyle
 import android.support.v4.media.session.MediaControllerCompat
@@ -32,7 +30,7 @@ import com.likhanov.radioplayer.util.Store
 import com.likhanov.radioplayer.util.extensions.hasInternetConnection
 import java.util.*
 
-class RadioNotificationManager(val service: RadioService, val context: Context?) : BroadcastReceiver() {
+class RadioNotificationManager(val service: MediaBrowserServiceCompat, val context: Context?) : BroadcastReceiver() {
 
     private val TAG = "RadioNotification"
 
