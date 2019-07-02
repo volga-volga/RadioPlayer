@@ -29,7 +29,7 @@ import java.lang.ref.WeakReference
 
 
 open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackServiceCallback,
-    AudioManager.OnAudioFocusChangeListener, RadioServiceCallback {
+        AudioManager.OnAudioFocusChangeListener, RadioServiceCallback {
 
     private val TAG = "RadioService"
 
@@ -66,7 +66,7 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
 
     }
 
-    override fun init(service: MediaBrowserServiceCompat, serviceClass: Class<*>){
+    override fun init(service: MediaBrowserServiceCompat, serviceClass: Class<*>) {
         Store.init(applicationContext)
         this.service = service
         this.serviceClass = serviceClass
@@ -86,13 +86,13 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
         playbackManager.updatePlaybackState(null)
 
         disposable.add(
-            radioStateController.getRequestStateChangeObservable().subscribe {
-                if (it == PlaybackStateCompat.ACTION_PLAY) {
-                    playbackManager.handlePlayRequest()
-                } else if (it == PlaybackStateCompat.ACTION_PAUSE) {
-                    playbackManager.handlePauseRequest()
+                radioStateController.getRequestStateChangeObservable().subscribe {
+                    if (it == PlaybackStateCompat.ACTION_PLAY) {
+                        playbackManager.handlePlayRequest()
+                    } else if (it == PlaybackStateCompat.ACTION_PAUSE) {
+                        playbackManager.handlePauseRequest()
+                    }
                 }
-            }
         )
         initAudioManager()
     }
@@ -124,7 +124,7 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
     }
 
 
-    override fun updateUrl(url: String) = playback.updateUrl(url)
+    override fun updateUrl(url: String, masterStream: Boolean) = playback.updateUrl(url, masterStream)
 
     override fun setAd(url: String) = playback.setAd(url)
 
@@ -141,11 +141,17 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
         }
     }
 
+    override fun setDefaultDrawable(drawableRes: Int) = radioNotificationManager.setDefaultDrawable(drawableRes)
+
+    override fun setActivityForNotificationIntent(activity: Class<*>) = radioNotificationManager.setActivityForNotificationIntent(activity)
+
+    override fun setNotificationDrawable(drawableRes: Int) = radioNotificationManager.setNotificationDrawable(drawableRes)
+
     override fun onPlaybackStart() {
         session.isActive = true
 
         delayedStopHandler.removeCallbacksAndMessages(null)
-        serviceClass?.let { startService(Intent(applicationContext, it))}
+        serviceClass?.let { startService(Intent(applicationContext, it)) }
     }
 
     override fun onNotificationRequired() {
@@ -180,7 +186,7 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
     }
 
     override fun onGetRoot(clientPackageName: String, clientUid: Int, rootHints: Bundle?): BrowserRoot? = BrowserRoot(
-        MEDIA_ID_ROOT, null
+            MEDIA_ID_ROOT, null
     )
 
     override fun onTaskRemoved(rootIntent: Intent?) {
@@ -200,14 +206,14 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
         audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             focusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
-                .setAudioAttributes(
-                    AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_GAME)
-                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                        .build()
-                )
-                .setAcceptsDelayedFocusGain(true)
-                .setOnAudioFocusChangeListener(this@RadioService, Handler())
-                .build()
+                    .setAudioAttributes(
+                            AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_GAME)
+                                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                                    .build()
+                    )
+                    .setAcceptsDelayedFocusGain(true)
+                    .setOnAudioFocusChangeListener(this@RadioService, Handler())
+                    .build()
         }
     }
 
@@ -217,9 +223,9 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
                 registerReceiver(myNoisyAudioStreamReceiver, intentFilter)
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
                     audioManager.requestAudioFocus(
-                        this@RadioService,
-                        AudioManager.STREAM_MUSIC,
-                        AudioManager.AUDIOFOCUS_GAIN
+                            this@RadioService,
+                            AudioManager.STREAM_MUSIC,
+                            AudioManager.AUDIOFOCUS_GAIN
                     )
                 else {
                     focusRequest?.let { audioManager.requestAudioFocus(it) }
@@ -256,7 +262,7 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
     override fun onAudioFocusChange(focusChange: Int) {
         val tgFocus = -3
         if (focusChange == AudioManager.AUDIOFOCUS_LOSS ||
-            focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT || focusChange == tgFocus
+                focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT || focusChange == tgFocus
         )
             if (playbackManager != null) playbackManager.handlePauseRequest()
     }

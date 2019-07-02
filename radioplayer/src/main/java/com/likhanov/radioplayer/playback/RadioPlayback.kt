@@ -59,7 +59,7 @@ class RadioPlayback(url: String) : Playback {
         playOnFocusGain = false
     }
 
-    fun updateUrl(url: String) = player.updateUrl(url)
+    fun updateUrl(url: String, masterStream: Boolean) = player.updateUrl(url, masterStream)
 
     fun setAd(url: String) = player.setAd(url)
 

@@ -80,21 +80,19 @@ class RadioNotificationManager(val service: MediaBrowserServiceCompat, val conte
         notificationManager.cancelAll()
     }
 
-    fun setDefaultDrawable(drawableRes: Int): RadioNotificationManager {
+    fun setDefaultDrawable(drawableRes: Int) {
         art = BitmapFactory.decodeResource(service.resources, drawableRes)
         lastBitmap = BitmapFactory.decodeResource(service.resources, drawableRes)
-        return this
     }
 
-    fun setActivityForNotificationIntent(activity: Class<*>): RadioNotificationManager {
+    fun setActivityForNotificationIntent(activity: Class<*>) {
         this.activity = activity
-        return this
     }
 
-    fun setNotificationDrawable(drawableRes: Int): RadioNotificationManager {
+    fun setNotificationDrawable(drawableRes: Int) {
         this.notificationImage = drawableRes
-        return this
     }
+
 
     fun startNotification() {
         if (!started) {
