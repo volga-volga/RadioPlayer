@@ -48,6 +48,7 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
     private var audioNoisyReceiverRegistered = false
     private var lastData: NotificationData? = null
     private lateinit var service: MediaBrowserServiceCompat
+    private lateinit var serviceClass: Class<*>
 
     companion object {
         const val MEDIA_ID_ROOT = "__ROOT__"
@@ -65,9 +66,10 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
 
     }
 
-    override fun init(service: MediaBrowserServiceCompat){
+    override fun init(service: MediaBrowserServiceCompat, serviceClass: Class<*>){
         Store.init(applicationContext)
         this.service = service
+        this.serviceClass = serviceClass
 
         delayedStopHandler = DelayedStopHandler(service)
         playback = RadioPlayback("")
@@ -143,7 +145,7 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
         session.isActive = true
 
         delayedStopHandler.removeCallbacksAndMessages(null)
-        startService(Intent(applicationContext, RadioService::class.java))
+        serviceClass?.let { startService(Intent(applicationContext, it))}
     }
 
     override fun onNotificationRequired() {
