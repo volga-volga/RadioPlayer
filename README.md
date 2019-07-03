@@ -10,7 +10,7 @@ allprojects {
     }
 }
 
-implementation 'com.github.LikhanovD:RadioPlayer:version'
+implementation 'com.github.volga-volga:RadioPlayer:version'
 ```
 
 ## Usage
