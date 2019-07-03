@@ -61,6 +61,12 @@ class RadioPlayback(url: String) : Playback {
 
     fun updateUrl(url: String, masterStream: Boolean) = player.updateUrl(url, masterStream)
 
+    fun playing() = player.isPlaying()
+
+    fun isPaused() = player.isPaused()
+
+    fun isRestarted() = player.isRestarted()
+
     fun setAd(url: String) = player.setAd(url)
 
     override fun seekTo(position: Long) {

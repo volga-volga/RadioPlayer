@@ -123,6 +123,11 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
         disposable.dispose()
     }
 
+    override fun isPlaying() = playback.playing()
+
+    override fun isPaused() = playback.isPaused()
+
+    override fun isRestarted() = playback.isRestarted()
 
     override fun updateUrl(url: String, masterStream: Boolean) = playback.updateUrl(url, masterStream)
 

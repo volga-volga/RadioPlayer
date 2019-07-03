@@ -53,6 +53,12 @@ class Player(private var url: String = "", private val listener: RadioPlayerCall
         this.masterStream = masterStream
     }
 
+    fun isPlaying() = mPlayback.isPlaying
+
+    fun isPaused() = mPlayback.isPaused
+
+    fun isRestarted() = mPlayback.isRestarted
+
     fun play() {
         try {
             if (masterStream) mPlayback.playMasterStream(url)

@@ -12,4 +12,7 @@ interface RadioServiceCallback {
     fun setDefaultDrawable(drawableRes: Int)
     fun setActivityForNotificationIntent(activity: Class<*>)
     fun setNotificationDrawable(drawableRes: Int)
+    fun isPlaying(): Boolean
+    fun isPaused(): Boolean
+    fun isRestarted(): Boolean
 }
