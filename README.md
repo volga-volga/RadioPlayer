@@ -26,7 +26,7 @@ class RadioPlayerService : RadioService() {
     override fun onCreate() {
         super.onCreate()
         init(this, RadioPlayerService::class.java)
-        updateUrl("http://kalina.fm/streams.m3u8")
+        updateUrl(url)
         setSessionActivity(MainActivity::class.java)
         setDefaultDrawable(R.drawable.ic_track_placeholder)
         setNotificationDrawable(R.mipmap.ic_notification)
