@@ -21,7 +21,10 @@ allprojects {
     repositories {
         google()
         jcenter()
-        
+        flatDir {
+            dirs 'libs'
+            dirs project(':radioplayer').file('libs')
+        }
     }
 }
 
