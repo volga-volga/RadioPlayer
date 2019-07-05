@@ -1,7 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.likhanov.radioplayer">
 
-    <application>
+    <application
+            android:name=".RadioApp">
 
         <receiver android:name="android.support.v4.media.session.MediaButtonReceiver">
             <intent-filter>
