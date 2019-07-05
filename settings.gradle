@@ -1,1 +1,1 @@
-include ':app', ':radioplayer'
+include ':app', ':radioplayer', ':startrek_player-release'

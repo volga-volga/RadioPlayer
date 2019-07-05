@@ -46,4 +46,5 @@ dependencies {
     implementation files('../aar/startrek_player-release.aar')
     implementation 'com.android.support:multidex:1.0.3'
     compile project(path: ':radioplayer')
+    implementation project(path: ':startrek_player-release')
 }
