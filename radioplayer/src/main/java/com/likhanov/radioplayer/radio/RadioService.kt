@@ -31,6 +31,10 @@ import java.lang.ref.WeakReference
 open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackServiceCallback,
         AudioManager.OnAudioFocusChangeListener, RadioServiceCallback {
 
+    init {
+        System.loadLibrary("startrek_player")
+    }
+
     private val TAG = "RadioService"
 
     private lateinit var playbackManager: PlaybackManager
