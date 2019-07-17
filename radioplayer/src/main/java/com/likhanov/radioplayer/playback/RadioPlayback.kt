@@ -10,6 +10,10 @@ class RadioPlayback(url: String) : Playback {
 
     private val playerCallback: RadioPlayerCallback = object : RadioPlayerCallback() {
 
+        override fun onDaastSkip() {
+
+        }
+
         override fun onPlay() {
             callback?.onPlaybackStatusChanged(PlaybackStateCompat.STATE_PLAYING)
         }

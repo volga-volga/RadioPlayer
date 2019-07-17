@@ -61,7 +61,7 @@ class Player(private var url: String = "", private val listener: RadioPlayerCall
 
     fun play() {
         try {
-            if (masterStream) mPlayback.playMasterStream(url)
+            if (masterStream) mPlayback.playMasterUrl(url)
             else mPlayback.playUrl(url)
         } catch (err: Exception) {
             Log.e("stateTag", "play error", err)
