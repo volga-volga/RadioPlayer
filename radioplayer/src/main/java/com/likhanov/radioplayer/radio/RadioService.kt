@@ -180,6 +180,17 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
         unregisterAudioNoisyReceiver()
     }
 
+    override fun forceStop() {
+        session.isActive = false
+
+        delayedStopHandler.removeCallbacksAndMessages(null)
+        delayedStopHandler.sendEmptyMessageDelayed(0, STOP_DELAY.toLong())
+
+        stopForeground(true)
+        radioNotificationManager.started = false
+        unregisterAudioNoisyReceiver()
+    }
+
     override fun onPlaybackStateUpdated(state: PlaybackStateCompat) {
         if (state.state == PlaybackStateCompat.STATE_PLAYING) registerAudioNoisyReceiver()
         session.setPlaybackState(state)
@@ -269,10 +280,8 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
     }
 
     override fun onAudioFocusChange(focusChange: Int) {
-        val tgFocus = -3
         if (focusChange == AudioManager.AUDIOFOCUS_LOSS ||
-                focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT || focusChange == tgFocus
-        )
+                focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT)
             if (playbackManager != null) playbackManager.handlePauseRequest()
     }
 }

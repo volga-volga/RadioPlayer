@@ -1,13 +1,17 @@
 package com.likhanov.radioplayer.playback
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.SystemClock
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.text.TextUtils
+import android.util.Log
+import com.likhanov.radioplayer.util.extensions.hasInternetConnection
 
-class PlaybackManager(val playback: Playback, private val serviceCallback: PlaybackServiceCallback) : Playback.Callback {
+class PlaybackManager(val playback: Playback, private val serviceCallback: PlaybackServiceCallback) :
+    Playback.Callback {
 
     val TAG = "playback_manager"
 
@@ -57,22 +61,35 @@ class PlaybackManager(val playback: Playback, private val serviceCallback: Playb
         }
     }
 
+    @SuppressLint("CheckResult")
     fun handlePlayRequest() {
-        serviceCallback.onPlaybackStart()
-        playback.play()
+        hasInternetConnection().subscribe({
+            if (it) {
+                Log.d("stateTag", "handlePlayRequest")
+                serviceCallback.onPlaybackStart()
+                playback.play()
+            }
+        }, Throwable::printStackTrace)
     }
 
+    @SuppressLint("CheckResult")
     fun handlePauseRequest() {
-        if (playback.isPlaying) {
-            playback.pause()
-            serviceCallback.onPlaybackStop()
-        }
+        hasInternetConnection().subscribe({
+            if (it) {
+                Log.d("stateTag", "handlePauseRequest")
+                if (playback.isPlaying) {
+                    playback.pause()
+                    serviceCallback.onPlaybackStop()
+                }
+            } else handleStopRequest(null)
+        }, Throwable::printStackTrace)
     }
 
     fun handleStopRequest(withError: String?) {
-        //playback.stop(true)
-        serviceCallback.onPlaybackStop()
-        updatePlaybackState(withError)
+        playback.state = PlaybackStateCompat.STATE_PAUSED
+        updatePlaybackState(null)
+        playback.stop(true)
+        serviceCallback.forceStop()
     }
 
     fun updatePlaybackState(error: String?) {
@@ -82,7 +99,7 @@ class PlaybackManager(val playback: Playback, private val serviceCallback: Playb
         }
 
         val stateBuilder = PlaybackStateCompat.Builder()
-                .setActions(getAvailableActions())
+            .setActions(getAvailableActions())
 
         var state = playback.state
 
@@ -139,5 +156,7 @@ class PlaybackManager(val playback: Playback, private val serviceCallback: Playb
         fun onPlaybackStateUpdated(state: PlaybackStateCompat)
 
         fun onPlaybackMetadataUpdated(metadata: MediaMetadataCompat)
+
+        fun forceStop()
     }
 }
