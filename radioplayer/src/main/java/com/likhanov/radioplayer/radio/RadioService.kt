@@ -269,10 +269,8 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
     }
 
     override fun onAudioFocusChange(focusChange: Int) {
-        val tgFocus = -3
         if (focusChange == AudioManager.AUDIOFOCUS_LOSS ||
-                focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT || focusChange == tgFocus
-        )
+                focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT)
             if (playbackManager != null) playbackManager.handlePauseRequest()
     }
 }
