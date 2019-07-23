@@ -89,7 +89,7 @@ class PlaybackManager(val playback: Playback, private val serviceCallback: Playb
         playback.state = PlaybackStateCompat.STATE_PAUSED
         updatePlaybackState(null)
         playback.stop(true)
-        serviceCallback.forceStop()
+        serviceCallback.onPlaybackStop()
     }
 
     fun updatePlaybackState(error: String?) {
@@ -156,7 +156,5 @@ class PlaybackManager(val playback: Playback, private val serviceCallback: Playb
         fun onPlaybackStateUpdated(state: PlaybackStateCompat)
 
         fun onPlaybackMetadataUpdated(metadata: MediaMetadataCompat)
-
-        fun forceStop()
     }
 }
