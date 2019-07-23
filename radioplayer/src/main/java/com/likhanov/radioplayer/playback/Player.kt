@@ -84,7 +84,8 @@ class Player(private var url: String = "", private val listener: RadioPlayerCall
         if (!released) {
             Log.d("stateTag", "release")
             mPlayback.stop()
-            mPlayback.isRestarted = false
+            mPlayback.isRestarted = false //вызывает PlaybackStateCompat.STATE_ERROR и радио больше не может воспроизвестись само
+                                        // (или флаг все-таки работает, поэтому в play() установка этого флага в true)
             released = true
         }
     }
