@@ -94,5 +94,6 @@ class RadioPlayback(url: String) : Playback {
     }
 
     private fun releaseResources() {
+        player.release()
     }
 }

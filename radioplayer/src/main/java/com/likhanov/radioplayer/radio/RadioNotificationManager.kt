@@ -1,7 +1,10 @@
 package com.likhanov.radioplayer.radio
 
 import android.annotation.SuppressLint
-import android.app.*
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -27,7 +30,6 @@ import com.bumptech.glide.request.transition.Transition
 import com.likhanov.radioplayer.R
 import com.likhanov.radioplayer.model.NotificationData
 import com.likhanov.radioplayer.util.Store
-import com.likhanov.radioplayer.util.extensions.hasInternetConnection
 import java.util.*
 
 class RadioNotificationManager(val service: MediaBrowserServiceCompat, val context: Context?) : BroadcastReceiver() {
@@ -131,22 +133,8 @@ class RadioNotificationManager(val service: MediaBrowserServiceCompat, val conte
     override fun onReceive(context: Context?, intent: Intent?) {
         val action = intent?.action
         when (action) {
-            ACTION_PAUSE ->{
-                hasInternetConnection().subscribe({
-                    if (it) transportControls?.pause()
-                    else transportControls?.stop()
-                }, Throwable::printStackTrace)
-            }
-            ACTION_PLAY -> {
-                hasInternetConnection().subscribe({
-                    if (it) {
-                        try {
-                            transportControls?.play()
-                        } catch (e: Exception) {
-                        }
-                    }
-                }, Throwable::printStackTrace)
-            }
+            ACTION_PAUSE -> transportControls?.pause()
+            ACTION_PLAY -> transportControls?.play()
             ACTION_STOP -> stopNotification()
             else -> Log.d(TAG, "Unknown intent ignored. Action=$action")
         }

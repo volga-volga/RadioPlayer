@@ -63,6 +63,8 @@ class Player(private var url: String = "", private val listener: RadioPlayerCall
         try {
             if (masterStream) mPlayback.playMasterUrl(url)
             else mPlayback.playUrl(url)
+            released = false
+            mPlayback.isRestarted = true
         } catch (err: Exception) {
             Log.e("stateTag", "play error", err)
         }
@@ -73,6 +75,17 @@ class Player(private var url: String = "", private val listener: RadioPlayerCall
             mPlayback.pause()
         } catch (err: Exception) {
             err.printStackTrace()
+        }
+    }
+
+    var released = false
+
+    fun release() {
+        if (!released) {
+            Log.d("stateTag", "release")
+            mPlayback.stop()
+            mPlayback.isRestarted = false
+            released = true
         }
     }
 }
