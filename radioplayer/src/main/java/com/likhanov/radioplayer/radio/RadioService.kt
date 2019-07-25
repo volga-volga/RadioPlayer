@@ -199,8 +199,8 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
     )
 
     override fun onTaskRemoved(rootIntent: Intent?) {
-        if (playbackManager != null && !playbackManager.playback.isPlaying)
-            stopSelf()
+       /* if (playbackManager != null && !playbackManager.playback.isPlaying)
+            stopSelf()*/
     }
 
     private class DelayedStopHandler(service: Service) : Handler() {

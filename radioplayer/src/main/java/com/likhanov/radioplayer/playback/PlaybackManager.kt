@@ -116,7 +116,7 @@ class PlaybackManager(val playback: Playback, private val serviceCallback: Playb
 
         serviceCallback.onPlaybackStateUpdated(stateBuilder.build())
 
-        if (state == PlaybackStateCompat.STATE_PLAYING || state == PlaybackStateCompat.STATE_PAUSED) {
+        if (state == PlaybackStateCompat.STATE_PLAYING) {
             serviceCallback.onNotificationRequired()
         }
     }
