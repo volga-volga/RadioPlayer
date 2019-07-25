@@ -225,6 +225,7 @@ class RadioNotificationManager(val service: MediaBrowserServiceCompat, val conte
     private var lastData: NotificationData? = null
     @SuppressLint("RestrictedApi")
     fun updateNotification(data: NotificationData?, forPause: Boolean?) {
+        Log.d(TAG, "updateNotification")
         try {
             val notification = createNotification(data, null, forPause)
             notificationManager.notify(NOTIFICATION_ID, notification)
@@ -234,7 +235,8 @@ class RadioNotificationManager(val service: MediaBrowserServiceCompat, val conte
                 } ?: loadBitmap(data.imagePath)
             lastData = data
         } catch (e: Exception) {
-            Handler().postDelayed({ updateNotification(data, forPause) }, 1000)
+            Log.e(TAG, "updateNotification", e)
+            //Handler().postDelayed({ updateNotification(data, forPause) }, 1000)
         }
     }
 

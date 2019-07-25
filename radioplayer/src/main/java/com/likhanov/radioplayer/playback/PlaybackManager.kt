@@ -74,6 +74,7 @@ class PlaybackManager(val playback: Playback, private val serviceCallback: Playb
 
     @SuppressLint("CheckResult")
     fun handlePauseRequest() {
+        Log.d(TAG, "handlePauseRequest")
         hasInternetConnection().subscribe({
             if (it) {
                 Log.d("stateTag", "handlePauseRequest")
@@ -86,6 +87,7 @@ class PlaybackManager(val playback: Playback, private val serviceCallback: Playb
     }
 
     fun handleStopRequest(withError: String?) {
+        Log.d(TAG, "handleStopRequest")
         playback.state = PlaybackStateCompat.STATE_PAUSED
         updatePlaybackState(null)
         playback.stop(true)
@@ -131,10 +133,6 @@ class PlaybackManager(val playback: Playback, private val serviceCallback: Playb
         }
 
         return actions
-    }
-
-    override fun onCompletion() {
-        handleStopRequest(null)
     }
 
     override fun onPlaybackStatusChanged(state: Int) {

@@ -66,11 +66,6 @@ public interface Playback {
 
     interface Callback {
         /**
-         * On current music completed.
-         */
-        void onCompletion();
-
-        /**
          * on Playback status changed
          * Implementations can use this callback to update
          * playback state on the media sessions.

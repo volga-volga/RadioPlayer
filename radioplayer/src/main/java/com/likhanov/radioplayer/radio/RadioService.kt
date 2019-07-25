@@ -20,6 +20,7 @@ import android.support.v4.media.session.MediaButtonReceiver
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.support.v7.media.MediaRouter
+import android.util.Log
 import com.likhanov.radioplayer.model.NotificationData
 import com.likhanov.radioplayer.playback.PlaybackManager
 import com.likhanov.radioplayer.playback.RadioPlayback
@@ -29,7 +30,7 @@ import java.lang.ref.WeakReference
 
 
 open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackServiceCallback,
-        AudioManager.OnAudioFocusChangeListener, RadioServiceCallback {
+    AudioManager.OnAudioFocusChangeListener, RadioServiceCallback {
 
     init {
         System.loadLibrary("startrek_player")
@@ -90,13 +91,13 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
         playbackManager.updatePlaybackState(null)
 
         disposable.add(
-                radioStateController.getRequestStateChangeObservable().subscribe {
-                    if (it == PlaybackStateCompat.ACTION_PLAY) {
-                        playbackManager.handlePlayRequest()
-                    } else if (it == PlaybackStateCompat.ACTION_PAUSE) {
-                        playbackManager.handlePauseRequest()
-                    }
+            radioStateController.getRequestStateChangeObservable().subscribe {
+                if (it == PlaybackStateCompat.ACTION_PLAY) {
+                    playbackManager.handlePlayRequest()
+                } else if (it == PlaybackStateCompat.ACTION_PAUSE) {
+                    playbackManager.handlePauseRequest()
                 }
+            }
         )
         initAudioManager()
     }
@@ -120,7 +121,6 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
     override fun onDestroy() {
         super.onDestroy()
         unregisterAudioNoisyReceiver()
-        playbackManager.handleStopRequest(null)
         radioNotificationManager.stopNotification()
         delayedStopHandler.removeCallbacksAndMessages(null)
         session.release()
@@ -144,6 +144,7 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
     }
 
     override fun updateNotification(data: NotificationData?) {
+        Log.d(TAG, "updateNotification")
         data?.let {
             lastData = data
             if (needUpdateNotification) radioNotificationManager.updateNotification(data, null)
@@ -152,9 +153,11 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
 
     override fun setDefaultDrawable(drawableRes: Int) = radioNotificationManager.setDefaultDrawable(drawableRes)
 
-    override fun setActivityForNotificationIntent(activity: Class<*>) = radioNotificationManager.setActivityForNotificationIntent(activity)
+    override fun setActivityForNotificationIntent(activity: Class<*>) =
+        radioNotificationManager.setActivityForNotificationIntent(activity)
 
-    override fun setNotificationDrawable(drawableRes: Int) = radioNotificationManager.setNotificationDrawable(drawableRes)
+    override fun setNotificationDrawable(drawableRes: Int) =
+        radioNotificationManager.setNotificationDrawable(drawableRes)
 
     override fun onPlaybackStart() {
         session.isActive = true
@@ -169,6 +172,7 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
     }
 
     override fun onPlaybackStop() {
+        Log.d(TAG, "onPlaybackStop")
         session.isActive = false
 
         delayedStopHandler.removeCallbacksAndMessages(null)
@@ -195,12 +199,12 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
     }
 
     override fun onGetRoot(clientPackageName: String, clientUid: Int, rootHints: Bundle?): BrowserRoot? = BrowserRoot(
-            MEDIA_ID_ROOT, null
+        MEDIA_ID_ROOT, null
     )
 
     override fun onTaskRemoved(rootIntent: Intent?) {
-       /* if (playbackManager != null && !playbackManager.playback.isPlaying)
-            stopSelf()*/
+        if (playbackManager != null && !playbackManager.playback.isPlaying)
+            stopSelf()
     }
 
     private class DelayedStopHandler(service: Service) : Handler() {
@@ -215,14 +219,14 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
         audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             focusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
-                    .setAudioAttributes(
-                            AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_GAME)
-                                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                                    .build()
-                    )
-                    .setAcceptsDelayedFocusGain(true)
-                    .setOnAudioFocusChangeListener(this@RadioService, Handler())
-                    .build()
+                .setAudioAttributes(
+                    AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_GAME)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .build()
+                )
+                .setAcceptsDelayedFocusGain(true)
+                .setOnAudioFocusChangeListener(this@RadioService, Handler())
+                .build()
         }
     }
 
@@ -232,9 +236,9 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
                 registerReceiver(myNoisyAudioStreamReceiver, intentFilter)
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
                     audioManager.requestAudioFocus(
-                            this@RadioService,
-                            AudioManager.STREAM_MUSIC,
-                            AudioManager.AUDIOFOCUS_GAIN
+                        this@RadioService,
+                        AudioManager.STREAM_MUSIC,
+                        AudioManager.AUDIOFOCUS_GAIN
                     )
                 else {
                     focusRequest?.let { audioManager.requestAudioFocus(it) }
@@ -270,7 +274,8 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
 
     override fun onAudioFocusChange(focusChange: Int) {
         if (focusChange == AudioManager.AUDIOFOCUS_LOSS ||
-                focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT)
+            focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT
+        )
             if (playbackManager != null) playbackManager.handlePauseRequest()
     }
 }
