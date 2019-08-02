@@ -97,6 +97,7 @@ class RadioNotificationManager(val service: MediaBrowserServiceCompat, val conte
 
 
     fun startNotification() {
+        Log.d("NotifTag", "startNotifi")
         if (!started) {
             metadata = controller?.metadata
             playbackState = controller?.playbackState
@@ -110,6 +111,7 @@ class RadioNotificationManager(val service: MediaBrowserServiceCompat, val conte
                 filter.addAction(ACTION_STOP)
                 service.registerReceiver(this, filter)
 
+                Log.d("NotifTag", "startForeground")
                 service.startForeground(NOTIFICATION_ID, notification)
                 started = true
             }
@@ -117,6 +119,7 @@ class RadioNotificationManager(val service: MediaBrowserServiceCompat, val conte
     }
 
     fun stopNotification() {
+        Log.d("NotifTag", "stopNotification")
         if (started) {
             started = false
             try {
@@ -126,6 +129,7 @@ class RadioNotificationManager(val service: MediaBrowserServiceCompat, val conte
                 // ignore if the receiver is not registered.
             }
 
+            Log.d("NotifTag", "stopForeground")
             service.stopForeground(true)
         }
     }
@@ -225,7 +229,7 @@ class RadioNotificationManager(val service: MediaBrowserServiceCompat, val conte
     private var lastData: NotificationData? = null
     @SuppressLint("RestrictedApi")
     fun updateNotification(data: NotificationData?, forPause: Boolean?) {
-        Log.d(TAG, "updateNotification")
+        Log.d("NotifTag", "updateNotification")
         try {
             val notification = createNotification(data, null, forPause)
             notificationManager.notify(NOTIFICATION_ID, notification)
@@ -268,7 +272,7 @@ class RadioNotificationManager(val service: MediaBrowserServiceCompat, val conte
         }
         if (notificationManager.getNotificationChannel(CHANNEL_ID) == null) {
             val notificationChannel = NotificationChannel(
-                CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_HIGH
+                CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_DEFAULT
             )
 
             notificationChannel.description = "$channelName description"

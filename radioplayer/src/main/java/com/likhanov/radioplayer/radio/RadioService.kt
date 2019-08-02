@@ -61,7 +61,7 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
         const val CMD_NAME = "CMD_NAME"
         const val CMD_PAUSE = "CMD_PAUSE"
         private const val STOP_DELAY = 3000
-        private var needUpdateNotification = true
+        private var needUpdateNotification = false
 
         class NotificationDismissedReceiver : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent) {
@@ -180,7 +180,8 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
 
         stopForeground(false)
         radioNotificationManager.started = false
-        radioNotificationManager.updateNotification(lastData, true)
+        if(needUpdateNotification) radioNotificationManager.updateNotification(lastData, true)
+        needUpdateNotification = false
         unregisterAudioNoisyReceiver()
     }
 
