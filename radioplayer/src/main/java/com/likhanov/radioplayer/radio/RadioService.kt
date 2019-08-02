@@ -84,6 +84,7 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
         sessionToken = session.sessionToken
         session.setCallback(playbackManager.mediaSessionCallback)
         session.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS or MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS)
+        session.isActive = true
 
         radioNotificationManager = RadioNotificationManager(service, baseContext)
         mediaRouter = MediaRouter.getInstance(applicationContext)
