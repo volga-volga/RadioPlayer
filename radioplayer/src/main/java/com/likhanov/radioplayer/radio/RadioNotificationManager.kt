@@ -13,7 +13,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
 import android.os.Build
-import android.os.Handler
 import android.os.RemoteException
 import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
@@ -109,7 +108,11 @@ class RadioNotificationManager(val service: MediaBrowserServiceCompat, val conte
                 filter.addAction(ACTION_PAUSE)
                 filter.addAction(ACTION_PLAY)
                 filter.addAction(ACTION_STOP)
-                service.registerReceiver(this, filter)
+                try {
+                    service.registerReceiver(this, filter)
+                } catch (e: Exception) {
+
+                }
 
                 Log.d("NotifTag", "startForeground")
                 service.startForeground(NOTIFICATION_ID, notification)

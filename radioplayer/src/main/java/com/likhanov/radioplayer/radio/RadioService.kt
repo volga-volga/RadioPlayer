@@ -13,6 +13,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
+import android.support.v4.content.ContextCompat
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaBrowserServiceCompat
 import android.support.v4.media.MediaMetadataCompat
@@ -45,7 +46,6 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
     private lateinit var radioNotificationManager: RadioNotificationManager
     private lateinit var mediaRouter: MediaRouter
     private val radioStateController = RadioStateController()
-    private lateinit var delayedStopHandler: DelayedStopHandler
     private lateinit var audioManager: AudioManager
     private var focusRequest: AudioFocusRequest? = null
     private val myNoisyAudioStreamReceiver = NoisyAudioStreamReceiver()
@@ -76,7 +76,6 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
         this.service = service
         this.serviceClass = serviceClass
 
-        delayedStopHandler = DelayedStopHandler(service)
         playback = RadioPlayback("")
         playbackManager = PlaybackManager(playback, this)
 
@@ -114,8 +113,6 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
             } else MediaButtonReceiver.handleIntent(session, startIntent)
         }
 
-        delayedStopHandler.removeCallbacksAndMessages(null)
-        delayedStopHandler.sendEmptyMessageDelayed(0, STOP_DELAY.toLong())
         return START_STICKY
     }
 
@@ -123,7 +120,6 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
         super.onDestroy()
         unregisterAudioNoisyReceiver()
         radioNotificationManager.stopNotification()
-        delayedStopHandler.removeCallbacksAndMessages(null)
         session.release()
         disposable.dispose()
     }
@@ -145,7 +141,7 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
     }
 
     override fun updateNotification(data: NotificationData?) {
-        Log.d(TAG, "updateNotification")
+        Log.d(TAG, "updateNotification, $needUpdateNotification")
         data?.let {
             lastData = data
             if (needUpdateNotification) radioNotificationManager.updateNotification(data, null)
@@ -161,27 +157,30 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
         radioNotificationManager.setNotificationDrawable(drawableRes)
 
     override fun onPlaybackStart() {
+        Log.d(TAG, "onPlaybackStart")
         session.isActive = true
 
-        delayedStopHandler.removeCallbacksAndMessages(null)
-        serviceClass?.let { startService(Intent(applicationContext, it)) }
+        serviceClass?.let {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                ContextCompat.startForegroundService(applicationContext, Intent(applicationContext, it))
+            } else startService(Intent(applicationContext, it))
+        }
     }
 
     override fun onNotificationRequired() {
+        Log.d(TAG, "onNotificationRequired")
         needUpdateNotification = true
         radioNotificationManager.startNotification()
+        radioNotificationManager.updateNotification(lastData, null)
     }
 
     override fun onPlaybackStop() {
         Log.d(TAG, "onPlaybackStop")
         session.isActive = false
 
-        delayedStopHandler.removeCallbacksAndMessages(null)
-        delayedStopHandler.sendEmptyMessageDelayed(0, STOP_DELAY.toLong())
-
         stopForeground(false)
         radioNotificationManager.started = false
-        if(needUpdateNotification) radioNotificationManager.updateNotification(lastData, true)
+        if (needUpdateNotification) radioNotificationManager.updateNotification(lastData, true)
         needUpdateNotification = false
         unregisterAudioNoisyReceiver()
     }
@@ -208,14 +207,6 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
         if (playbackManager != null && !playbackManager.playback.isPlaying)
             stopSelf()
     }
-
-    private class DelayedStopHandler(service: Service) : Handler() {
-        private val weakReference: WeakReference<Service> = WeakReference<Service>(service)
-
-        override fun handleMessage(msg: Message) {
-        }
-    }
-
 
     private fun initAudioManager() {
         audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
