@@ -163,6 +163,7 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
         serviceClass?.let {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 ContextCompat.startForegroundService(applicationContext, Intent(applicationContext, it))
+                radioNotificationManager.startNotification()
             } else startService(Intent(applicationContext, it))
         }
     }

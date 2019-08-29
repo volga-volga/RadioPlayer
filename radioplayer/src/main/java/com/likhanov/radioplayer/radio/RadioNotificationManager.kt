@@ -31,7 +31,8 @@ import com.likhanov.radioplayer.model.NotificationData
 import com.likhanov.radioplayer.util.Store
 import java.util.*
 
-class RadioNotificationManager(val service: MediaBrowserServiceCompat, val context: Context?) : BroadcastReceiver() {
+class RadioNotificationManager(val service: MediaBrowserServiceCompat, val context: Context?) :
+    BroadcastReceiver() {
 
     private val TAG = "RadioNotification"
 
@@ -61,7 +62,8 @@ class RadioNotificationManager(val service: MediaBrowserServiceCompat, val conte
     var started = false
     private val notificationBuilder = NotificationCompat.Builder(service, CHANNEL_ID)
     private var art = BitmapFactory.decodeResource(service.resources, R.drawable.ic_song_image)
-    private var lastBitmap = BitmapFactory.decodeResource(service.resources, R.drawable.ic_song_image)
+    private var lastBitmap =
+        BitmapFactory.decodeResource(service.resources, R.drawable.ic_song_image)
     private var activity: Class<*>? = null
     private var notificationImage: Int? = null
 
@@ -97,28 +99,25 @@ class RadioNotificationManager(val service: MediaBrowserServiceCompat, val conte
 
     fun startNotification() {
         Log.d("NotifTag", "startNotifi")
-        if (!started) {
-            metadata = controller?.metadata
-            playbackState = controller?.playbackState
 
-            // The notification must be updated after setting started to true
-            val notification = createNotification(lastData, null, false)
-            if (notification != null) {
-                val filter = IntentFilter()
-                filter.addAction(ACTION_PAUSE)
-                filter.addAction(ACTION_PLAY)
-                filter.addAction(ACTION_STOP)
-                try {
-                    service.registerReceiver(this, filter)
-                } catch (e: Exception) {
+        metadata = controller?.metadata
+        playbackState = controller?.playbackState
 
-                }
+        // The notification must be updated after setting started to true
+        val notification = createNotification(lastData, null, false)
+        val filter = IntentFilter()
+        filter.addAction(ACTION_PAUSE)
+        filter.addAction(ACTION_PLAY)
+        filter.addAction(ACTION_STOP)
+        try {
+            service.registerReceiver(this, filter)
+        } catch (e: Exception) {
 
-                Log.d("NotifTag", "startForeground")
-                service.startForeground(NOTIFICATION_ID, notification)
-                started = true
-            }
         }
+
+        Log.d("NotifTag", "startForeground")
+        service.startForeground(NOTIFICATION_ID, notification)
+        started = true
     }
 
     fun stopNotification() {
@@ -152,7 +151,12 @@ class RadioNotificationManager(val service: MediaBrowserServiceCompat, val conte
             val openUI = Intent(service, activity)
             openUI.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
 
-            return PendingIntent.getActivity(service, REQUEST_CODE, openUI, PendingIntent.FLAG_CANCEL_CURRENT)
+            return PendingIntent.getActivity(
+                service,
+                REQUEST_CODE,
+                openUI,
+                PendingIntent.FLAG_CANCEL_CURRENT
+            )
         } ?: return null
     }
 
@@ -168,11 +172,11 @@ class RadioNotificationManager(val service: MediaBrowserServiceCompat, val conte
         }
     }
 
-    private fun createNotification(data: NotificationData?, bitmap: Bitmap?, forPause: Boolean?): Notification? {
-        if (playbackState == null) {
-            return null
-        }
-
+    private fun createNotification(
+        data: NotificationData?,
+        bitmap: Bitmap?,
+        forPause: Boolean?
+    ): Notification {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel()
         }
@@ -199,7 +203,8 @@ class RadioNotificationManager(val service: MediaBrowserServiceCompat, val conte
     }
 
     private fun createOnDismissedIntent(): PendingIntent {
-        val intent = Intent(context, RadioService.Companion.NotificationDismissedReceiver::class.java)
+        val intent =
+            Intent(context, RadioService.Companion.NotificationDismissedReceiver::class.java)
 
         val pendingIntent = PendingIntent.getBroadcast(context, NOTIFICATION_ID, intent, 0)
         return pendingIntent
@@ -256,12 +261,21 @@ class RadioNotificationManager(val service: MediaBrowserServiceCompat, val conte
                     override fun onLoadFailed(errorDrawable: Drawable?) {
                         super.onLoadFailed(errorDrawable)
                         lastBitmap = null
-                        notificationManager.notify(NOTIFICATION_ID, createNotification(null, null, null))
+                        notificationManager.notify(
+                            NOTIFICATION_ID,
+                            createNotification(null, null, null)
+                        )
                     }
 
-                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                    override fun onResourceReady(
+                        resource: Bitmap,
+                        transition: Transition<in Bitmap>?
+                    ) {
                         lastBitmap = resource
-                        notificationManager.notify(NOTIFICATION_ID, createNotification(null, resource, null))
+                        notificationManager.notify(
+                            NOTIFICATION_ID,
+                            createNotification(null, resource, null)
+                        )
                     }
                 })
     }
