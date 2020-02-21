@@ -1,7 +1,6 @@
 package com.likhanov.radioplayer.radio
 
 import android.app.PendingIntent
-import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -12,7 +11,6 @@ import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.os.Message
 import android.support.v4.content.ContextCompat
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaBrowserServiceCompat
@@ -27,11 +25,10 @@ import com.likhanov.radioplayer.playback.PlaybackManager
 import com.likhanov.radioplayer.playback.RadioPlayback
 import com.likhanov.radioplayer.util.Store
 import io.reactivex.disposables.CompositeDisposable
-import java.lang.ref.WeakReference
 
 
 open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackServiceCallback,
-    AudioManager.OnAudioFocusChangeListener, RadioServiceCallback {
+    AudioManager.OnAudioFocusChangeListener, RadioServiceListener {
 
     init {
         System.loadLibrary("startrek_player")
@@ -54,6 +51,7 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
     private var lastData: NotificationData? = null
     private lateinit var service: MediaBrowserServiceCompat
     private lateinit var serviceClass: Class<*>
+    private var radioServiceCallback: RadioServiceCallback? = null
 
     companion object {
         const val MEDIA_ID_ROOT = "__ROOT__"
@@ -124,6 +122,10 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
         disposable.dispose()
     }
 
+    override fun setCallback(callback: RadioServiceCallback) {
+        this.radioServiceCallback = callback
+    }
+
     override fun isPlaying() = playback.playing()
 
     override fun isPaused() = playback.isPaused()
@@ -133,6 +135,8 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
     override fun updateUrl(url: String, masterStream: Boolean) = playback.updateUrl(url, masterStream)
 
     override fun setAd(url: String) = playback.setAd(url)
+
+    override fun daastClicked() = playback.daastClicked()
 
     override fun setSessionActivity(activity: Class<*>) {
         val intent = Intent(applicationContext, activity)
@@ -194,6 +198,18 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
 
     override fun onPlaybackMetadataUpdated(metadata: MediaMetadataCompat) {
         session.setMetadata(metadata)
+    }
+
+    override fun onDaastStart(image: String, link: String) {
+        radioServiceCallback?.onDaastStart(image, link)
+    }
+
+    override fun onDaastEnd() {
+        radioServiceCallback?.onDaastEnd()
+    }
+
+    override fun onDaastError() {
+        radioServiceCallback?.onDaastError()
     }
 
     override fun onLoadChildren(parentId: String, result: Result<MutableList<MediaBrowserCompat.MediaItem>>) {

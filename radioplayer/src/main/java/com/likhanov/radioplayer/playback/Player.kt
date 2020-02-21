@@ -48,6 +48,8 @@ class Player(private var url: String = "", private val listener: RadioPlayerCall
         mPlayback.setDaastUrl(adUrl)
     }
 
+    fun daastClicked() = mPlayback.daastClicked()
+
     fun updateUrl(url: String, masterStream: Boolean = false) {
         this.url = url
         this.masterStream = masterStream

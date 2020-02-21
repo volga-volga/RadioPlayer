@@ -76,6 +76,10 @@ public interface Playback {
          * @param error to be added to the PlaybackState
          */
         void onError(String error);
+
+        void onDaastStart(String image, String link);
+        void onDaastEnd();
+        void onDaastError();
     }
 
     void setCallback(Callback callback);

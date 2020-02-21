@@ -144,6 +144,18 @@ class PlaybackManager(val playback: Playback, private val serviceCallback: Playb
         updatePlaybackState(error)
     }
 
+    override fun onDaastStart(image: String?, link: String?) {
+        serviceCallback.onDaastStart(image ?: "", link ?: "")
+    }
+
+    override fun onDaastEnd() {
+        serviceCallback.onDaastEnd()
+    }
+
+    override fun onDaastError() {
+        serviceCallback.onDaastError()
+    }
+
     interface PlaybackServiceCallback {
         fun onPlaybackStart()
 
@@ -154,5 +166,9 @@ class PlaybackManager(val playback: Playback, private val serviceCallback: Playb
         fun onPlaybackStateUpdated(state: PlaybackStateCompat)
 
         fun onPlaybackMetadataUpdated(metadata: MediaMetadataCompat)
+
+        fun onDaastStart(image: String, link: String)
+        fun onDaastEnd()
+        fun onDaastError()
     }
 }

@@ -2,9 +2,11 @@ package ru.vvdev.radiolibrary
 
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import com.google.gson.Gson
 import com.likhanov.radioplayer.model.NotificationData
 import com.likhanov.radioplayer.radio.RadioService
+import com.likhanov.radioplayer.radio.RadioServiceCallback
 import io.socket.client.IO
 import io.socket.client.Socket
 import org.json.JSONArray
@@ -21,9 +23,23 @@ class TestService : RadioService() {
         super.onCreate()
         init(this, TestService::class.java)
         updateUrl("http://icecast-studio21.cdnvideo.ru/S21_1")
+        setAd("http://a.adwolf.ru/3145/getCode?pp=bl&ps=cmi&p2=jf&plp=f&pli=b&pop=k&dl=http://www.newradio.ru/")
         setSessionActivity(MainActivity::class.java)
         setActivityForNotificationIntent(MainActivity::class.java)
         initSockets()
+        setCallback(object : RadioServiceCallback{
+            override fun onDaastStart(image: String, link: String) {
+                Log.d("DaastTag", "onDaastStart, image = $image, link = $link")
+            }
+
+            override fun onDaastEnd() {
+                Log.d("DaastTag", "onDaastEnd")
+            }
+
+            override fun onDaastError() {
+                Log.d("DaastTag", "onDaastError")
+            }
+        })
     }
 
     override fun onDestroy() {

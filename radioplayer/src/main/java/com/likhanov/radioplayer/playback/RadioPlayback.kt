@@ -1,6 +1,7 @@
 package com.likhanov.radioplayer.playback
 
 import android.support.v4.media.session.PlaybackStateCompat
+import android.util.Log
 
 class RadioPlayback(url: String) : Playback {
 
@@ -10,8 +11,14 @@ class RadioPlayback(url: String) : Playback {
 
     private val playerCallback: RadioPlayerCallback = object : RadioPlayerCallback() {
 
-        override fun onDaastSkip() {
+        override fun onDaastError() {
+            callback?.onDaastError()
+        }
 
+        override fun onMeta(p0: String?) {
+        }
+
+        override fun onDaastSkip() {
         }
 
         override fun onPlay() {
@@ -20,6 +27,14 @@ class RadioPlayback(url: String) : Playback {
 
         override fun onPause() {
             callback?.onPlaybackStatusChanged(PlaybackStateCompat.STATE_PAUSED)
+        }
+
+        override fun onDaastStart(p0: String?, p1: String?, p2: String?) {
+            callback?.onDaastStart(p1, p2)
+        }
+
+        override fun onDaastEnd() {
+            callback?.onDaastEnd()
         }
 
         override fun onError(p0: String?, p1: Int) {
@@ -72,6 +87,8 @@ class RadioPlayback(url: String) : Playback {
     fun isRestarted() = player.isRestarted()
 
     fun setAd(url: String) = player.setAd(url)
+
+    fun daastClicked() = player.daastClicked()
 
     override fun seekTo(position: Long) {
 
