@@ -11,6 +11,7 @@ class Player(private var url: String = "", private val listener: RadioPlayerCall
     private lateinit var m_playbackBuilder: PlaybackStateCompat.Builder
     private lateinit var mPlayback: StartrekPlayer
     private var masterStream = false
+    private var lastPlayedUrl = ""
 
     init {
         System.loadLibrary("startrek_player")
@@ -63,8 +64,12 @@ class Player(private var url: String = "", private val listener: RadioPlayerCall
 
     fun play() {
         try {
-            if (masterStream) mPlayback.playMasterUrl(url)
-            else mPlayback.playUrl(url)
+            when {
+                lastPlayedUrl != url -> mPlayback.playUrl(url)
+                masterStream -> mPlayback.playMasterUrl(url)
+                else -> mPlayback.play()
+            }
+            lastPlayedUrl = url
             released = false
             mPlayback.isRestarted = true
         } catch (err: Exception) {
