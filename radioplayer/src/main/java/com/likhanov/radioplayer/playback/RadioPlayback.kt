@@ -41,6 +41,10 @@ class RadioPlayback(url: String) : Playback {
             callback?.onError("Player error $p0, $p1")
             releaseResources()
         }
+
+        override fun onStop() {
+            callback?.onDaastEnd()
+        }
     }
     private var player = Player(url, playerCallback)
 
