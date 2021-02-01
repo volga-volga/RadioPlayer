@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 
-group='com.github.volga-volga'
+group='com.github.volga-volga.RadioPlayer'
 
 android {
     compileSdkVersion 29

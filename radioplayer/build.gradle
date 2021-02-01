@@ -4,7 +4,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'com.github.dcendents.android-maven'
 
-group='com.github.volga-volga'
+group='com.github.volga-volga.RadioPlayer'
 
 android {
     compileSdkVersion 29
