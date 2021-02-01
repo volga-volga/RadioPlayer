@@ -53,6 +53,7 @@ dependencies {
     implementation 'com.android.support:multidex:1.0.3'
 
     implementation project(":startrek-player")
+
 }
 repositories {
     mavenCentral()
