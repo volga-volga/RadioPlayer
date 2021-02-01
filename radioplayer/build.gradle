@@ -1,10 +1,10 @@
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'com.github.dcendents.android-maven'
 
-group='com.github.volga-volga.RadioPlayer'
+group='com.github.volga-volga'
 
 android {
     compileSdkVersion 29
