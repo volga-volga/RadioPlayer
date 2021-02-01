@@ -1,5 +1,7 @@
 apply plugin: 'com.android.library'
 
+group='com.github.volga-volga'
+
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.0"
