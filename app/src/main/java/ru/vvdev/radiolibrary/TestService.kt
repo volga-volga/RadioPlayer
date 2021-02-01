@@ -22,8 +22,8 @@ class TestService : RadioService() {
     override fun onCreate() {
         super.onCreate()
         init(this, TestService::class.java)
-        updateUrl("http://icecast-studio21.cdnvideo.ru/S21_1")
         setAd("http://a.adwolf.ru/3145/getCode?pp=bl&ps=cmi&p2=jf&plp=f&pli=b&pop=k&dl=http://www.newradio.ru/")
+        updateUrl("http://icecast-studio21.cdnvideo.ru/S21_1")
         setSessionActivity(MainActivity::class.java)
         setActivityForNotificationIntent(MainActivity::class.java)
         initSockets()

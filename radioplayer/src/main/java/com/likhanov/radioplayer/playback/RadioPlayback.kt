@@ -11,39 +11,25 @@ class RadioPlayback(url: String) : Playback {
 
     private val playerCallback: RadioPlayerCallback = object : RadioPlayerCallback() {
 
-        override fun onDaastError() {
+        override fun daastError(message: String?) {
             callback?.onDaastError()
         }
 
-        override fun onMeta(p0: String?) {
+        override fun isPlayingChanged(isPlaying: Boolean) {
+            if(isPlaying) callback?.onPlaybackStatusChanged(PlaybackStateCompat.STATE_PLAYING)
+            else callback?.onPlaybackStatusChanged(PlaybackStateCompat.STATE_PAUSED)
         }
 
-        override fun onDaastSkip() {
+        override fun daastStarted(meta: String?, imageUrl: String?, clickUrl: String?) {
+            callback?.onDaastStart(imageUrl, clickUrl)
         }
 
-        override fun onPlay() {
-            callback?.onPlaybackStatusChanged(PlaybackStateCompat.STATE_PLAYING)
-        }
-
-        override fun onPause() {
-            callback?.onPlaybackStatusChanged(PlaybackStateCompat.STATE_PAUSED)
-        }
-
-        override fun onDaastStart(p0: String?, p1: String?, p2: String?) {
-            callback?.onDaastStart(p1, p2)
-        }
-
-        override fun onDaastEnd() {
+        override fun daastEnded() {
             callback?.onDaastEnd()
         }
 
-        override fun onError(p0: String?, p1: Int) {
-            callback?.onError("Player error $p0, $p1")
-            releaseResources()
-        }
-
-        override fun onStop() {
-            callback?.onDaastEnd()
+        override fun error(message: String?) {
+            callback?.onError("Player error $message")
         }
     }
     private var player = Player(url, playerCallback)

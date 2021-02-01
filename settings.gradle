@@ -1,1 +1,2 @@
-include ':app', ':radioplayer'
+rootProject.name='RadioLibrary'
+include ':app', ':radioplayer', ':startrek-player'

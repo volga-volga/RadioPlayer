@@ -2,8 +2,8 @@ package com.likhanov.radioplayer.playback
 
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
+import com.infteh.startrekplayer.StartrekPlayer
 import com.likhanov.radioplayer.util.Store
-import org.radiobox.startrek_player.StartrekPlayer
 import java.util.*
 
 
@@ -14,7 +14,7 @@ class Player(private var url: String = "", private val listener: RadioPlayerCall
     private var lastPlayedUrl = ""
 
     init {
-        System.loadLibrary("startrek_player")
+        System.loadLibrary("StartrekPlayerNative" + StartrekPlayer.PREFERRED_ABI)
         init()
     }
 
@@ -22,17 +22,6 @@ class Player(private var url: String = "", private val listener: RadioPlayerCall
         // STPlayer
         mPlayback = StartrekPlayer.create()
         mPlayback.setDelegate(listener)
-        mPlayback.setNetBuffer(25000)
-        mPlayback.setNetPrebuf(Math.round(100 * (2000.0 / 25000.0)).toInt())
-        mPlayback.setAgent("Android Startrek Player Radio Service Application")
-        mPlayback.isRestarted = true
-        mPlayback.setReferer("Android Startrek Player")
-        var userId = Store.getString(Store.PREF_USER_ID)
-        if (userId.isBlank()) {
-            Store.storeData(Store.PREF_USER_ID, UUID.randomUUID().toString())
-            userId = Store.getString(Store.PREF_USER_ID)
-        }
-        mPlayback.setUserId(userId)
 
         // Set an initial PlaybackState with ACTION_PLAY, so media buttons can start the player
         m_playbackBuilder = PlaybackStateCompat.Builder()
@@ -49,7 +38,7 @@ class Player(private var url: String = "", private val listener: RadioPlayerCall
         mPlayback.setDaastUrl(adUrl)
     }
 
-    fun daastClicked() = mPlayback.daastClicked()
+    fun daastClicked() = mPlayback.daastClick()
 
     fun updateUrl(url: String, masterStream: Boolean = false) {
         this.url = url
@@ -66,12 +55,9 @@ class Player(private var url: String = "", private val listener: RadioPlayerCall
         try {
             when {
                 lastPlayedUrl != url -> mPlayback.playUrl(url)
-                masterStream -> mPlayback.playMasterUrl(url)
                 else -> mPlayback.play()
             }
             lastPlayedUrl = url
-            released = false
-            mPlayback.isRestarted = true
         } catch (err: Exception) {
             Log.e("stateTag", "play error", err)
         }
@@ -85,15 +71,8 @@ class Player(private var url: String = "", private val listener: RadioPlayerCall
         }
     }
 
-    var released = false
 
     fun release() {
-        if (!released) {
-            Log.d("stateTag", "release")
-            mPlayback.stop()
-            mPlayback.isRestarted = false //вызывает PlaybackStateCompat.STATE_ERROR и радио больше не может воспроизвестись само
-                                        // (или флаг все-таки работает, поэтому в play() установка этого флага в true)
-            released = true
-        }
+        mPlayback.stop()
     }
 }
