@@ -3,43 +3,10 @@
 
 package com.infteh.startrekplayer;
 
-import android.util.Log;
-
-import java.security.KeyStore;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
-
 public abstract class StartrekNetwork {
-    public static ArrayList<byte[]> getSSLCertificates()
-    {
-        ArrayList<byte[]> certificateList = new ArrayList<byte[]>();
-
-        try {
-            TrustManagerFactory factory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            factory.init((KeyStore) null);
-
-            for (TrustManager manager : factory.getTrustManagers()) {
-                if (manager instanceof X509TrustManager) {
-                    X509TrustManager trustManager = (X509TrustManager) manager;
-
-                    for (X509Certificate certificate : trustManager.getAcceptedIssuers()) {
-                        byte[] buffer = certificate.getEncoded();
-                        certificateList.add(buffer);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            Log.e("StartrekNetwork", "Failed to get certificates", e);
-        }
-
-        return certificateList;
-    }
-
     public static int netTimeoutMs()
     {
         return CppProxy.netTimeoutMs();
@@ -60,11 +27,6 @@ public abstract class StartrekNetwork {
         return CppProxy.netPrebufWait();
     }
 
-    public static String userId()
-    {
-        return CppProxy.userId();
-    }
-
     public static String userAgent()
     {
         return CppProxy.userAgent();
@@ -73,6 +35,16 @@ public abstract class StartrekNetwork {
     public static String referer()
     {
         return CppProxy.referer();
+    }
+
+    public static String statisticaUserId()
+    {
+        return CppProxy.statisticaUserId();
+    }
+
+    public static String statisticaReferer()
+    {
+        return CppProxy.statisticaReferer();
     }
 
     public static void setNetTimeoutMs(int netTimeoutMs)
@@ -95,11 +67,6 @@ public abstract class StartrekNetwork {
         CppProxy.setNetPrebufWait(netPrebufWait);
     }
 
-    public static void setUserId(String userId)
-    {
-        CppProxy.setUserId(userId);
-    }
-
     public static void setUserAgent(String userAgent)
     {
         CppProxy.setUserAgent(userAgent);
@@ -108,6 +75,16 @@ public abstract class StartrekNetwork {
     public static void setReferer(String referer)
     {
         CppProxy.setReferer(referer);
+    }
+
+    public static void setStatisticaUserId(String statisticaUserId)
+    {
+        CppProxy.setStatisticaUserId(statisticaUserId);
+    }
+
+    public static void setStatisticaReferer(String statisticaReferer)
+    {
+        CppProxy.setStatisticaReferer(statisticaReferer);
     }
 
     public static void setCaCertificates(ArrayList<byte[]> certificates)
@@ -146,11 +123,13 @@ public abstract class StartrekNetwork {
 
         public static native boolean netPrebufWait();
 
-        public static native String userId();
-
         public static native String userAgent();
 
         public static native String referer();
+
+        public static native String statisticaUserId();
+
+        public static native String statisticaReferer();
 
         public static native void setNetTimeoutMs(int netTimeoutMs);
 
@@ -160,11 +139,13 @@ public abstract class StartrekNetwork {
 
         public static native void setNetPrebufWait(boolean netPrebufWait);
 
-        public static native void setUserId(String userId);
-
         public static native void setUserAgent(String userAgent);
 
         public static native void setReferer(String referer);
+
+        public static native void setStatisticaUserId(String statisticaUserId);
+
+        public static native void setStatisticaReferer(String statisticaReferer);
 
         public static native void setCaCertificates(ArrayList<byte[]> certificates);
     }
