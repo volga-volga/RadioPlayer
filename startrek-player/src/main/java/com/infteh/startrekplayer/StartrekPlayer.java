@@ -3,31 +3,11 @@
 
 package com.infteh.startrekplayer;
 
-import android.os.Build;
-
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class StartrekPlayer {
-    public static final List<String> LIBS_ABIS = Arrays.asList("arm64-v8a",
-            "armeabi-v7a",
-            "x86",
-            "x86_64");
-    public static String PREFERRED_ABI;
-
-    static {
-        PREFERRED_ABI = "";
-        for (String abi : Build.SUPPORTED_ABIS) {
-            if (LIBS_ABIS.contains(abi)) {
-                PREFERRED_ABI = "_" + abi;
-                break;
-            }
-        }
-        System.loadLibrary("Qt5Core" + PREFERRED_ABI);
-    }
-
+    /** Player delegate */
     public abstract void deleteDelegate();
 
     public abstract void setDelegate(StartrekPlayerDelegate delegate);
