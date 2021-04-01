@@ -2,6 +2,7 @@ package com.likhanov.radioplayer.playback
 
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
+import com.infteh.startrekplayer.StartrekAndroid
 import com.infteh.startrekplayer.StartrekPlayer
 import com.likhanov.radioplayer.util.Store
 import java.util.*
@@ -14,7 +15,7 @@ class Player(private var url: String = "", private val listener: RadioPlayerCall
     private var lastPlayedUrl = ""
 
     init {
-        System.loadLibrary("StartrekPlayerNative" + StartrekPlayer.PREFERRED_ABI)
+        System.loadLibrary("StartrekPlayerNative" + StartrekAndroid.PREFERRED_ABI)
         init()
     }
 
