@@ -20,6 +20,8 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.support.v7.media.MediaRouter
 import android.util.Log
+import com.infteh.startrekplayer.StartrekAndroid
+import com.infteh.startrekplayer.StartrekAndroid.getSSLCertificates
 import com.infteh.startrekplayer.StartrekNetwork
 import com.infteh.startrekplayer.StartrekPlayer
 import com.likhanov.radioplayer.model.NotificationData
@@ -33,7 +35,7 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
     AudioManager.OnAudioFocusChangeListener, RadioServiceListener {
 
     init {
-        System.loadLibrary("StartrekPlayerNative" + StartrekPlayer.PREFERRED_ABI)
+        System.loadLibrary("StartrekPlayerNative" + StartrekAndroid.PREFERRED_ABI)
     }
 
     private val TAG = "RadioService"
@@ -73,7 +75,7 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
 
     override fun init(service: MediaBrowserServiceCompat, serviceClass: Class<*>) {
         Store.init(applicationContext)
-        StartrekNetwork.setCaCertificates(StartrekNetwork.getSSLCertificates())
+        StartrekNetwork.setCaCertificates(getSSLCertificates())
         this.service = service
         this.serviceClass = serviceClass
 
