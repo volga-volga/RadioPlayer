@@ -1,3 +1,2 @@
-include ':startrek-player'
 rootProject.name='RadioLibrary'
 include ':app', ':radioplayer'
