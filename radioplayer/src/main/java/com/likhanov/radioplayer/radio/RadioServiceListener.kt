@@ -1,6 +1,6 @@
 package com.likhanov.radioplayer.radio
 
-import android.support.v4.media.MediaBrowserServiceCompat
+import androidx.media.MediaBrowserServiceCompat
 import com.likhanov.radioplayer.model.NotificationData
 
 interface RadioServiceListener {

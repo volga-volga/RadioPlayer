@@ -14,11 +14,11 @@ import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.RemoteException
-import android.support.annotation.RequiresApi
-import android.support.v4.app.NotificationCompat
-import android.support.v4.media.MediaBrowserServiceCompat
+import androidx.annotation.RequiresApi
+import androidx.core.app.NotificationCompat
+import androidx.media.MediaBrowserServiceCompat
 import android.support.v4.media.MediaMetadataCompat
-import android.support.v4.media.app.NotificationCompat.MediaStyle
+import androidx.media.app.NotificationCompat.MediaStyle
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
@@ -205,9 +205,7 @@ class RadioNotificationManager(val service: MediaBrowserServiceCompat, val conte
     private fun createOnDismissedIntent(): PendingIntent {
         val intent =
             Intent(context, RadioService.Companion.NotificationDismissedReceiver::class.java)
-
-        val pendingIntent = PendingIntent.getBroadcast(context, NOTIFICATION_ID, intent, 0)
-        return pendingIntent
+        return PendingIntent.getBroadcast(context, NOTIFICATION_ID, intent, 0)
     }
 
     @SuppressLint("RestrictedApi")
@@ -235,9 +233,10 @@ class RadioNotificationManager(val service: MediaBrowserServiceCompat, val conte
     }
 
     private var lastData: NotificationData? = null
+
     @SuppressLint("RestrictedApi")
     fun updateNotification(data: NotificationData?, forPause: Boolean?) {
-        Log.d("NotifTag", "updateNotification")
+        Log.d(TAG, "updateNotification")
         try {
             val notification = createNotification(data, null, forPause)
             notificationManager.notify(NOTIFICATION_ID, notification)
