@@ -23,7 +23,6 @@ import android.util.Log
 import com.infteh.startrekplayer.StartrekAndroid
 import com.infteh.startrekplayer.StartrekAndroid.getSSLCertificates
 import com.infteh.startrekplayer.StartrekNetwork
-import com.infteh.startrekplayer.StartrekPlayer
 import com.likhanov.radioplayer.model.NotificationData
 import com.likhanov.radioplayer.playback.PlaybackManager
 import com.likhanov.radioplayer.playback.RadioPlayback
@@ -88,7 +87,7 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
         session.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS or MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS)
         session.isActive = true
 
-        radioNotificationManager = RadioNotificationManager(service, baseContext)
+        radioNotificationManager = RadioNotificationManager(service, baseContext,this)
         mediaRouter = MediaRouter.getInstance(applicationContext)
 
         playbackManager.updatePlaybackState(null)
