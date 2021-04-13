@@ -11,15 +11,15 @@ import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import androidx.core.content.ContextCompat
 import android.support.v4.media.MediaBrowserCompat
-import androidx.media.MediaBrowserServiceCompat
 import android.support.v4.media.MediaMetadataCompat
-import androidx.media.session.MediaButtonReceiver
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import androidx.mediarouter.media.MediaRouter
 import android.util.Log
+import androidx.core.content.ContextCompat
+import androidx.media.MediaBrowserServiceCompat
+import androidx.media.session.MediaButtonReceiver
+import androidx.mediarouter.media.MediaRouter
 import com.infteh.startrekplayer.StartrekAndroid
 import com.infteh.startrekplayer.StartrekAndroid.getSSLCertificates
 import com.infteh.startrekplayer.StartrekNetwork
@@ -77,6 +77,9 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
         StartrekNetwork.setCaCertificates(getSSLCertificates())
         this.service = service
         this.serviceClass = serviceClass
+        audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        val sid = audioManager.generateAudioSessionId()
+        StartrekAndroid.setAudioSessionId(sid)
 
         playback = RadioPlayback("")
         playbackManager = PlaybackManager(playback, this)
@@ -230,7 +233,8 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
     }
 
     private fun initAudioManager() {
-        audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             focusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
                 .setAudioAttributes(
