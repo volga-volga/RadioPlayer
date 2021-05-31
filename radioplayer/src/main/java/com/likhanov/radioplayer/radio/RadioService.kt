@@ -11,19 +11,18 @@ import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.support.v4.content.ContextCompat
 import android.support.v4.media.MediaBrowserCompat
-import android.support.v4.media.MediaBrowserServiceCompat
 import android.support.v4.media.MediaMetadataCompat
-import android.support.v4.media.session.MediaButtonReceiver
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import android.support.v7.media.MediaRouter
 import android.util.Log
+import androidx.core.content.ContextCompat
+import androidx.media.MediaBrowserServiceCompat
+import androidx.media.session.MediaButtonReceiver
+import androidx.mediarouter.media.MediaRouter
 import com.infteh.startrekplayer.StartrekAndroid
 import com.infteh.startrekplayer.StartrekAndroid.getSSLCertificates
 import com.infteh.startrekplayer.StartrekNetwork
-import com.infteh.startrekplayer.StartrekPlayer
 import com.likhanov.radioplayer.model.NotificationData
 import com.likhanov.radioplayer.playback.PlaybackManager
 import com.likhanov.radioplayer.playback.RadioPlayback
@@ -78,6 +77,9 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
         StartrekNetwork.setCaCertificates(getSSLCertificates())
         this.service = service
         this.serviceClass = serviceClass
+        audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        val sid = audioManager.generateAudioSessionId()
+        StartrekAndroid.setAudioSessionId(sid)
 
         playback = RadioPlayback("")
         playbackManager = PlaybackManager(playback, this)
@@ -88,7 +90,7 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
         session.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS or MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS)
         session.isActive = true
 
-        radioNotificationManager = RadioNotificationManager(service, baseContext)
+        radioNotificationManager = RadioNotificationManager(service, baseContext,this)
         mediaRouter = MediaRouter.getInstance(applicationContext)
 
         playbackManager.updatePlaybackState(null)
@@ -231,7 +233,8 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
     }
 
     private fun initAudioManager() {
-        audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             focusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
                 .setAudioAttributes(

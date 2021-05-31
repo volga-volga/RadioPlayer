@@ -12,13 +12,14 @@ import android.content.IntentFilter
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
+import android.media.MediaMetadata
 import android.os.Build
 import android.os.RemoteException
-import android.support.annotation.RequiresApi
-import android.support.v4.app.NotificationCompat
-import android.support.v4.media.MediaBrowserServiceCompat
+import androidx.annotation.RequiresApi
+import androidx.core.app.NotificationCompat
+import androidx.media.MediaBrowserServiceCompat
 import android.support.v4.media.MediaMetadataCompat
-import android.support.v4.media.app.NotificationCompat.MediaStyle
+import androidx.media.app.NotificationCompat.MediaStyle
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
@@ -31,7 +32,11 @@ import com.likhanov.radioplayer.model.NotificationData
 import com.likhanov.radioplayer.util.Store
 import java.util.*
 
-class RadioNotificationManager(val service: MediaBrowserServiceCompat, val context: Context?) :
+class RadioNotificationManager(
+    private val service: MediaBrowserServiceCompat,
+    private val context: Context?,
+    val radioService: RadioService
+) :
     BroadcastReceiver() {
 
     private val TAG = "RadioNotification"
@@ -98,7 +103,7 @@ class RadioNotificationManager(val service: MediaBrowserServiceCompat, val conte
 
 
     fun startNotification() {
-        Log.d("NotifTag", "startNotifi")
+        Log.d(TAG, "startNotifi")
 
         metadata = controller?.metadata
         playbackState = controller?.playbackState
@@ -112,26 +117,27 @@ class RadioNotificationManager(val service: MediaBrowserServiceCompat, val conte
         try {
             service.registerReceiver(this, filter)
         } catch (e: Exception) {
-
+            e.printStackTrace()
         }
 
-        Log.d("NotifTag", "startForeground")
+        Log.d(TAG, "startForeground")
         service.startForeground(NOTIFICATION_ID, notification)
         started = true
     }
 
     fun stopNotification() {
-        Log.d("NotifTag", "stopNotification")
+        Log.d(TAG, "stopNotification")
         if (started) {
             started = false
             try {
                 notificationManager.cancel(NOTIFICATION_ID)
                 service.unregisterReceiver(this)
             } catch (ex: IllegalArgumentException) {
+                ex.printStackTrace()
                 // ignore if the receiver is not registered.
             }
 
-            Log.d("NotifTag", "stopForeground")
+            Log.d(TAG, "stopForeground")
             service.stopForeground(true)
         }
     }
@@ -162,7 +168,7 @@ class RadioNotificationManager(val service: MediaBrowserServiceCompat, val conte
 
     @Throws(RemoteException::class)
     private fun updateSessionToken() {
-        val freshToken = service.getSessionToken()
+        val freshToken = service.sessionToken
         if (sessionToken == null && freshToken != null || sessionToken != null && sessionToken != freshToken) {
             sessionToken = freshToken
             if (sessionToken != null) {
@@ -180,6 +186,14 @@ class RadioNotificationManager(val service: MediaBrowserServiceCompat, val conte
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel()
         }
+        val artist = data?.artist ?: lastData?.artist ?: ""
+        val track = lastData?.track ?: lastData?.track ?: ""
+        val image = bitmap ?: lastBitmap ?: art
+        val mddd = MediaMetadataCompat.Builder()
+            .putString(MediaMetadata.METADATA_KEY_TITLE, track)
+            .putString(MediaMetadata.METADATA_KEY_ARTIST, artist)
+            .build()
+        radioService.onPlaybackMetadataUpdated(mddd)
 
         addActions(notificationBuilder, forPause)
         notificationBuilder
@@ -205,9 +219,7 @@ class RadioNotificationManager(val service: MediaBrowserServiceCompat, val conte
     private fun createOnDismissedIntent(): PendingIntent {
         val intent =
             Intent(context, RadioService.Companion.NotificationDismissedReceiver::class.java)
-
-        val pendingIntent = PendingIntent.getBroadcast(context, NOTIFICATION_ID, intent, 0)
-        return pendingIntent
+        return PendingIntent.getBroadcast(context, NOTIFICATION_ID, intent, 0)
     }
 
     @SuppressLint("RestrictedApi")
@@ -235,9 +247,10 @@ class RadioNotificationManager(val service: MediaBrowserServiceCompat, val conte
     }
 
     private var lastData: NotificationData? = null
+
     @SuppressLint("RestrictedApi")
     fun updateNotification(data: NotificationData?, forPause: Boolean?) {
-        Log.d("NotifTag", "updateNotification")
+        Log.d(TAG, "updateNotification")
         try {
             val notification = createNotification(data, null, forPause)
             notificationManager.notify(NOTIFICATION_ID, notification)

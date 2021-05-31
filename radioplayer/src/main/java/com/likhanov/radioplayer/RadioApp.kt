@@ -1,6 +1,6 @@
 package com.likhanov.radioplayer
 
-import android.support.multidex.MultiDexApplication
+import androidx.multidex.MultiDexApplication
 
 class RadioApp: MultiDexApplication() {
 }
