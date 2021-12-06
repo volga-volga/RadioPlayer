@@ -291,9 +291,7 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
     }
 
     override fun onAudioFocusChange(focusChange: Int) {
-        if (focusChange == AudioManager.AUDIOFOCUS_LOSS ||
-            focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT
-        )
+        if (focusChange == AudioManager.AUDIOFOCUS_LOSS)
             if (playbackManager != null) playbackManager.handlePauseRequest()
     }
 }
