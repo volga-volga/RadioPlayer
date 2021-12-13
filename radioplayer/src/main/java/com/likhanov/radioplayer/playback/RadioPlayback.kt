@@ -85,12 +85,12 @@ class RadioPlayback(url: String) : Playback {
     }
 
     override fun setVolume(volume: Float) {
+        player.setVolume(volume.toDouble())
     }
 
     override fun getVolume(): Float {
-        return 0f
+        return player.getVolume().toFloat()
     }
-
     override fun setCurrentMediaId(mediaId: String?) {
     }
 

@@ -70,6 +70,11 @@ class Player(private var url: String = "", private val listener: RadioPlayerCall
         }
     }
 
+    fun setVolume(volume: Double) {
+        mPlayback.setVolume(volume)
+    }
+
+    fun getVolume()  = mPlayback.volume()
 
     fun release() {
         mPlayback.stop()

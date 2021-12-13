@@ -55,6 +55,7 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
     private lateinit var service: MediaBrowserServiceCompat
     private lateinit var serviceClass: Class<*>
     private var radioServiceCallback: RadioServiceCallback? = null
+    private var volume = 0f
 
     companion object {
         const val MEDIA_ID_ROOT = "__ROOT__"
@@ -291,9 +292,16 @@ open class RadioService : MediaBrowserServiceCompat(), PlaybackManager.PlaybackS
     }
 
     override fun onAudioFocusChange(focusChange: Int) {
-        if (focusChange == AudioManager.AUDIOFOCUS_LOSS ||
-            focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT
-        )
-            if (playbackManager != null) playbackManager.handlePauseRequest()
+        when (focusChange) {
+            AudioManager.AUDIOFOCUS_LOSS -> if (playbackManager != null) playbackManager.handlePauseRequest()
+            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
+                this.volume = playback.volume
+                playback.volume = 0f
+            }
+            AudioManager.AUDIOFOCUS_GAIN ->
+                playback.volume = this.volume
+
+        }
+
     }
 }
